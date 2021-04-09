@@ -96,6 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    include "dip_switch.h"
 #endif
 
+void joystick_task(void);
 // Only enable this if console is enabled to print to
 #if defined(DEBUG_MATRIX_SCAN_RATE)
 static uint32_t matrix_timer           = 0;
@@ -458,6 +459,7 @@ MATRIX_LOOP_END:
 #ifdef JOYSTICK_ENABLE
     joystick_task();
 #endif
+    joystick_task();
 
     // update LED
     if (led_status != host_keyboard_leds()) {

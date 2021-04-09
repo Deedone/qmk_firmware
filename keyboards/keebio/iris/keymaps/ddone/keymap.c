@@ -15,6 +15,9 @@
   */
 
 #include QMK_KEYBOARD_H
+#include "print.h"
+#include "analog.h"
+#include "split_util.h"
 
 enum custom_layers {
     _QWERTY,
@@ -24,12 +27,14 @@ enum custom_layers {
 };
 
 #define SPCFN1 LT(_LOWER, KC_SPC)
+#define BSPCFN2 LT(_RAISE, KC_BSPC)
 #define SFTESC LSFT_T(KC_ESC)
 
 enum custom_keycodes {
   LOWER = SAFE_RANGE,
   RAISE,
   ADJUST,
+  MACRO_LK
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -40,11 +45,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                               KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_DEL,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-     SFTESC, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                               KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_SFTENT,
+     KC_LSHIFT, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                               KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_SFTENT,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
      KC_LCTL, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    SPCFN1,           KC_DEL,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RCTL,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                    LOWER   , KC_LWIN,SPCFN1,                    RAISE,  RAISE,   KC_RALT
+                                    LOWER   , KC_LWIN,SPCFN1,                     RAISE,  KC_LSHIFT,   KC_RALT
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
@@ -52,13 +57,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
      KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                            KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_PGUP,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-     _______,   KC_1,    KC_2,    KC_3,    KC_4,    KC_LT,                             KC_GT,    KC_7,    KC_8,    KC_9,    KC_0,    KC_PIPE,
+     MACRO_LK,   KC_1,    KC_2,    KC_3,    KC_4,    KC_LT,                             KC_GT,    KC_7,    KC_8,    KC_9,    KC_0,    KC_PIPE,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      _______,  _______, _______, _______,_______, KC_LBRC,                            KC_RBRC, KC_4,    KC_5,     KC_6,   KC_PLUS, KC_MINS,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, _______, _______, _______, _______, KC_LPRN, LOWER,          _______, KC_RPRN,   KC_1,    KC_2,   KC_3,     KC_PAST, KC_PSLS,
+     _______, _______, _______, _______, _______, KC_LPRN, LOWER,            _______, KC_RPRN,   KC_1,    KC_2,   KC_3,     KC_PAST, KC_PSLS,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                    _______, _______, LOWER,                    _______,  _______, KC_0
+                                    _______, _______, LOWER,                      RAISE,  _______, KC_0
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
@@ -68,11 +73,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      _______, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC,                            KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, _______, KC_BSLS, KC_EQUAL,KC_QUOTE,KC_UNDS,                            KC_LEFT,  KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
+     _______, _______, KC_BSLS, KC_EQUAL,KC_DQUO ,KC_MINS,                            KC_LEFT,  KC_DOWN, KC_UP,   KC_RGHT, _______, _______,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, _______, _______, _______, _______, KC_MINS, LOWER,          _______, KC_PLUS, _______,  _______, _______, _______, _______,
+     _______, _______, _______, _______, KC_QUOTE, KC_UNDS, LOWER,            _______, KC_PLUS, _______,  _______, _______, _______, _______,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                    _______, _______, LOWER,                   _______, _______, _______
+                                    _______, _______, LOWER,                     RAISE, _______, _______
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   ),
 
@@ -84,9 +89,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      _______, _______, _______, RGB_RMOD,RGB_MOD, RGB_TOG ,                           KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, _______, _______,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, _______, _______, RGB_HUD, RGB_HUI, _______, LOWER,            _______, _______, _______, _______, _______, _______, _______,
+     _______, _______, _______, RGB_HUD, RGB_HUI, _______, LOWER,            RAISE  , TERM_ON, TERM_OFF, KC_ENTER, _______, _______, _______,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
-                                    _______, _______, LOWER,                   _______, _______, _______
+                                    _______, _______, LOWER,                      RAISE, _______, _______
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
   )
 };
@@ -121,13 +126,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
+    case MACRO_LK:
+      if (!record->event.pressed)
+	      SEND_STRING(SS_LWIN("d") SS_DELAY(100) "i3lock" SS_TAP(X_ENTER));
+      break;
   }
   return true;
 }
 
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-	case SFTESC:
+	case SPCFN1:
 	    return true;
 	default:
 	    return false;
@@ -136,8 +145,36 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
 
 	
 
-void encoder_update_user(uint8_t index, bool clockwise) {
 
+void joystick_task(void) {
+	return;
+#if 0
+static int counter = 0;
+	//print("Joystick task run\n");
+	if (!isLeftHand) {
+		// disable pull-up resistor
+		writePinLow(F7);
+		writePinLow(F6);
+
+		setPinOutput(F7);
+		setPinOutput(F6);
+		// if pin was a pull-up input, we need to uncharge it by turning it low
+		// before making it a low input
+		setPinInput(F6);
+		setPinInput(F7);
+		counter++;
+		if (counter == 100) {
+			int16_t a1 = analogReadPin(F6);
+			int16_t a2 = analogReadPin(F7);
+			uprintf("Axes are %d %d\n",a1,a2);
+			counter = 0;
+		}
+
+	}
+#endif
+}
+
+void encoder_update_user(uint8_t index, bool clockwise) {
 	switch (get_highest_layer(layer_state)) {
 	    case _LOWER:
 		if (clockwise) {
